@@ -7,7 +7,7 @@ target_include_directories(purple PUBLIC
         $<INSTALL_INTERFACE:include>
         PRIVATE src)
 
-target_link_libraries(purple ${MPI_LIBRARIES} boost-mpi boost-serialization)
+target_link_libraries(purple ${MPI_LIBRARIES} ${Boost_LIBRARIES})
 
 install(TARGETS purple EXPORT PurpleConfig
         ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}

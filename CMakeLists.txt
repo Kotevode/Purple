@@ -15,18 +15,7 @@ include_directories(${MPI_INCLUDE_PATH})
 ############################################################
 
 find_package(Boost REQUIRED mpi serialization)
-
-add_library(boost INTERFACE IMPORTED)
-set_property(TARGET boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-
-add_library(boost-mpi SHARED IMPORTED)
-set_property(TARGET boost-mpi PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-set_property(TARGET boost-mpi PROPERTY IMPORTED_LOCATION ${Boost_MPI_LIBRARY})
-
-add_library(boost-serialization SHARED IMPORTED)
-set_property(TARGET boost-serialization PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-set_property(TARGET boost-serialization PROPERTY IMPORTED_LOCATION ${Boost_SERIALIZATION_LIBRARY})
-
+include_directories(${Boost_INCLUDE_PATH})
 
 ############################################################
 # Google Test
