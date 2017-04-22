@@ -31,3 +31,9 @@ include_directories(${gtest_INCLUDE_DIRS})
 include(GNUInstallDirs)
 enable_testing()
 add_subdirectory(purple)
+
+############################################################
+# Dirichlet Solver
+############################################################
+
+add_subdirectory(dirichlet_solver)
