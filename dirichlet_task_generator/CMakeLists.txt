@@ -1,0 +1,4 @@
+add_executable(dirichlet_task_generator src/main.cpp src/MeshGenerator.cpp src/TaskGenerator.cpp)
+
+add_executable(dirichlet_task_generator_tests test/mesh_generator_tests.cpp src/MeshGenerator.cpp src/TaskGenerator.cpp test/task_generator_tests.cpp)
+target_link_libraries(dirichlet_task_generator_tests gtest gtest_main)

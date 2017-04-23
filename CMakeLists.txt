@@ -25,12 +25,24 @@ add_subdirectory(libs/googletest)
 include_directories(${gtest_INCLUDE_DIRS})
 
 ############################################################
+# CXXOPTS
+############################################################
+
+add_subdirectory(libs/cxxopts-master)
+
+############################################################
 # Purple
 ############################################################
 
 include(GNUInstallDirs)
 enable_testing()
 add_subdirectory(purple)
+
+############################################################
+# Dirichlet Task Generator
+############################################################
+
+add_subdirectory(dirichlet_task_generator)
 
 ############################################################
 # Dirichlet Solver
