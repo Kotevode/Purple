@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     if (argc > 1)
         size = atoi(argv[1]);
     if (argc > 2)
-        size = atoi(argv[2]);
+        count = atoi(argv[2]);
 
     cout << size << "\t" << size << endl;
 
