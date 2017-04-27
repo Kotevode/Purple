@@ -8,26 +8,45 @@
 
 using namespace std;
 
-TEST(MeshGeneratorTests, can_generate_mesh) {
+TEST(MeshGeneratorTests, can_generate_u) {
     int size = 100;
     auto generator = new MeshGenerator(
             X0, Y0, XN, YN, size
     );
-    double *mesh = generator->generate([](double x, double y) -> double {
+    double *u = generator->generate_u([](double x, double y) -> double {
         if (x == X0)
             return F_X0(y);
-        else if(x == XN)
+        else if (x == XN)
             return F_XN(y);
-        else if(y == Y0)
+        else if (y == Y0)
             return F_Y0(x);
-        else if(y == YN)
+        else if (y == YN)
             return F_YN(x);
+        else
+            return 0;
     });
     cout << endl;
     for(int i = 0; i < size; i++) {
         for(int j = 0; j < size; j++)
-            cout << mesh[i * size + j] << "\t";
+            cout << u[i * size + j] << "\t";
         cout << endl;
     }
-    free(mesh);
+    free(u);
+}
+
+TEST(MeshGeneratorTests, can_generate_f) {
+    int size = 100;
+    auto generator = new MeshGenerator(
+            X0, Y0, XN, YN, size
+    );
+    double *f = generator->generate_f([](double x, double y) -> double {
+        return F(x,y);
+    });
+    cout << endl;
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++)
+            cout << f[i * size + j] << "\t";
+        cout << endl;
+    }
+    free(f);
 }

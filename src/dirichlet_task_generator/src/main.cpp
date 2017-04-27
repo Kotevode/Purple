@@ -11,7 +11,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    int size = 1000;
+    int size = 10000;
     int count = 50;
     if (argc > 1)
         size = atoi(argv[1]);
@@ -20,11 +20,11 @@ int main(int argc, char *argv[]) {
 
     cout << size << "\t" << size << endl;
 
-    // Generating mesh
+    // Generating u-u
     auto generator = new MeshGenerator(
             X0, Y0, XN, YN, size
     );
-    double *mesh = generator->generate([](double x, double y) -> double {
+    double *u = generator->generate_u([](double x, double y) -> double {
         if (x == X0)
             return F_X0(y);
         else if (x == XN)
@@ -38,7 +38,17 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++)
-            cout << mesh[i * size + j] << "\t";
+            cout << u[i * size + j] << "\t";
+        cout << endl;
+    }
+    // Generating f-u
+    double *f = generator->generate_f([](double x, double y) -> double {
+        return F(x, y);
+    });
+
+    for(int i = 0; i < size; i++){
+        for( int j = 0; j < size; j++)
+            cout << f[i * size + j] << "\t";
         cout << endl;
     }
 
@@ -49,6 +59,7 @@ int main(int argc, char *argv[]) {
         cout << t << endl;
     });
 
-    free(mesh);
+    free(u);
+    free(f);
     return 0;
 }

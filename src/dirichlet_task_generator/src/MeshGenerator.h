@@ -10,10 +10,11 @@ class MeshGenerator {
 public:
     MeshGenerator(double x0, double y0, double xN, double yN, int size);
 
-    double *generate(double (*g)(double, double));
+    double *generate_u(double (*g)(double, double));
+    double *generate_f(double (*f)(double, double));
 
 private:
-    double x0, y0, xN, yN;
+    double x0, y0, xN, yN, dx, dy;
     int size;
 };
 

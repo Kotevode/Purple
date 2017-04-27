@@ -10,9 +10,9 @@ target_include_directories(purple PUBLIC
 target_link_libraries(purple ${MPI_LIBRARIES} ${Boost_LIBRARIES})
 
 install(TARGETS purple EXPORT PurpleConfig
-        ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})  # This is for Windows
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})  # This is for Windows
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(EXPORT PurpleConfig DESTINATION share/Purple/cmake)
@@ -23,3 +23,12 @@ add_executable(purple_tests test/distribution_tests.cpp test/processing_tests.cp
 target_link_libraries(purple_tests gtest gtest_main)
 target_link_libraries(purple_tests purple)
 add_test(purple_tests purple_tests)
+if (MPI_COMPILE_FLAGS)
+    set_target_properties(purple_tests PROPERTIES
+            COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
+endif ()
+
+if (MPI_LINK_FLAGS)
+    set_target_properties(purple_tests PROPERTIES
+            COMPILE_FLAGS "${MPI_LINK_FLAGS}")
+endif ()

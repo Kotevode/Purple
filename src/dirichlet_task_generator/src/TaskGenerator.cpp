@@ -12,9 +12,10 @@ vector<struct task> TaskGenerator::generate(int count, int height) {
     mt19937 gen(rd());
     normal_distribution<> distribution(height / count, height / count / 3);
     vector<struct task> result;
-    int offset = INTERSECTION;
+    int intersection = height / count / 6;
+    int offset = intersection;
     while (offset < height) {
-        offset -= INTERSECTION;
+        offset -= intersection;
         int task_size = round(distribution(gen));
         task_size =
                 offset + task_size > height ? height - offset : task_size;

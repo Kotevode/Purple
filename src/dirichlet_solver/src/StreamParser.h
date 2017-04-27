@@ -8,19 +8,22 @@
 #include "InputParser.h"
 #include <istream>
 
-class StreamParser : public InputParser {
+namespace Dirichlet {
 
-public:
-    StreamParser(istream &&stream) : stream(stream) {}
+    class StreamParser : public InputParser {
 
-    StreamParser(istream &stream) : stream(stream) {}
+    public:
+        StreamParser(istream &&stream) : stream(stream) {}
 
-    virtual Input parse_input() override;
+        StreamParser(istream &stream) : stream(stream) {}
 
-protected:
-    istream &stream;
+        virtual Input parse_input() override;
 
-};
+    protected:
+        istream &stream;
 
+    };
+
+}
 
 #endif //PURPLE_DISTRIBUTION_STREAMPARSER_H

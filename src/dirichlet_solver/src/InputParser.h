@@ -7,11 +7,15 @@
 
 #include "Input.h"
 
-class InputParser {
+namespace Dirichlet {
 
-public:
-    virtual Input parse_input() = 0;
+    class InputParser {
 
-};
+    public:
+        virtual Input parse_input() = 0;
+
+    };
+
+}
 
 #endif //PURPLE_DISTRIBUTION_INPUTPARSER_H

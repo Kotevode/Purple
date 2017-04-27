@@ -8,8 +8,6 @@
 #include <vector>
 #include <ostream>
 
-#define INTERSECTION 8
-
 using namespace std;
 
 struct task {
