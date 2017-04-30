@@ -14,40 +14,43 @@ using namespace boost::serialization;
 namespace Dirichlet {
 
     struct Result {
-        Result() {}
+        Result() : height(0), width(0), error(-1), mesh(nullptr), offset(0) {}
 
-        Result(int height, int width, double *mesh, double error) : height(height), width(width), mesh(mesh),
-                                                                    error(error) {}
+        Result(int height, int width, double *mesh, double error, int offset) : height(height), width(width), mesh(mesh),
+                                                                    error(error), offset(offset) {}
 
-        Result(const Result &r) : height(r.height), width(r.width), error(r.error) {
-            mesh = (double *)malloc(sizeof(double) * width * height);
+        Result(const Result &r) : height(r.height), width(r.width), error(r.error), offset(r.offset) {
+            mesh = (double *) malloc(sizeof(double) * width * height);
             memcpy(mesh, r.mesh, sizeof(double) * width * height);
         }
 
-        Result(Result &&r) : height(r.height), width(r.width), error(r.error) {
+        Result(Result &&r) : height(r.height), width(r.width), error(r.error), offset(r.offset) {
             mesh = r.mesh;
             r.mesh = nullptr;
         }
 
-        Result & operator=(const Result &r){
+        Result &operator=(const Result &r) {
             height = r.height;
             width = r.width;
             error = r.error;
-            mesh = (double *)malloc(sizeof(double) * width * height);
+            offset = r.offset;
+            mesh = (double *) malloc(sizeof(double) * width * height);
             memcpy(mesh, r.mesh, sizeof(double) * width * height);
             return *this;
         }
 
-        Result & operator=(Result &&r){
+        Result &operator=(Result &&r) {
             height = r.height;
             width = r.width;
             error = r.error;
+            offset = r.offset;
             mesh = r.mesh;
             r.mesh = nullptr;
             return *this;
         }
 
         int height, width;
+        int offset;
         double *mesh = nullptr;
         double error;
 
@@ -55,12 +58,12 @@ namespace Dirichlet {
             ar & height;
             ar & width;
             ar & error;
+            ar & offset;
             if (Archive::is_loading::value) {
                 assert(mesh == nullptr);
                 mesh = (double *) malloc(sizeof(double) * height * width);
             }
             ar & make_array<double>(mesh, height * width);
-            std::cout << "Serialized" << std::endl;
         }
 
         virtual ~Result() {

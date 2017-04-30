@@ -6,7 +6,7 @@
 #include <cxxopts.hpp>
 #include <fstream>
 #include "StreamParser.h"
-#include "Processor.h"
+#include "evaluation/Processor.h"
 #include <purple/Cluster.h>
 
 using namespace std;
@@ -20,7 +20,7 @@ Input get_input(const cxxopts::Options &options){
 }
 
 void calculate(Input &input) {
-    Processor p(input.u, input.f, input.width);
+    Evaluation::Processor p(input.u, input.f, input.width);
     Purple::Cluster c(0, NULL);
     auto results = c.process(input.jobs, p);
 }

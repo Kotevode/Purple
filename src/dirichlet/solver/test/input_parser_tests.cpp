@@ -18,8 +18,8 @@ TEST(InputParserTests, can_parse_from_file) {
     ASSERT_GT(input.height, 0);
     ASSERT_GT(input.jobs.size(), 0);
     for (int i = 0; i < input.height * input.width; i++){
-        ASSERT_NO_THROW(input.u[i] + 0);
-        ASSERT_NO_THROW(input.f[i] + 0);
+        ASSERT_NO_THROW(input.u[i]);
+        ASSERT_NO_THROW(input.f[i]);
     }
     for_each(input.jobs.begin(), input.jobs.end(), [](auto &j){
         cout << j << endl;

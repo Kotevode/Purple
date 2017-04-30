@@ -39,13 +39,7 @@ enable_testing()
 add_subdirectory(purple)
 
 ############################################################
-# Dirichlet Task Generator
+# Dirichlet
 ############################################################
 
-add_subdirectory(dirichlet_task_generator)
-
-############################################################
-# Dirichlet Solver
-############################################################
-
-add_subdirectory(dirichlet_solver)
+add_subdirectory(dirichlet)

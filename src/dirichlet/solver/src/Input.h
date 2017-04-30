@@ -5,11 +5,12 @@
 #ifndef PURPLE_DISTRIBUTION_INPUT_H
 #define PURPLE_DISTRIBUTION_INPUT_H
 
-#include "Job.h"
+#include "evaluation/Job.h"
 #include <vector>
 #include <iostream>
 
 using namespace std;
+using namespace Dirichlet::Evaluation;
 
 namespace Dirichlet {
 

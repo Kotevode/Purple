@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Dirichlet::Result Dirichlet::Processor::process(Dirichlet::Job &job) {
+Dirichlet::Result Dirichlet::Evaluation::Processor::process(Dirichlet::Evaluation::Job &job) {
     double error = numeric_limits<double>().max();
     int height = job.height;
 
@@ -31,5 +31,5 @@ Dirichlet::Result Dirichlet::Processor::process(Dirichlet::Job &job) {
         error = max_error;
     }
 
-    return Result(height, width, u_sliced, error);
+    return Result(height, width, u_sliced, error, job.offset);
 }
