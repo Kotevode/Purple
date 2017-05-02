@@ -27,8 +27,16 @@ namespace Purple {
 
         ~Cluster();
 
+        template<typename __closure>
+        void as_master(__closure closure) {
+            if (communicator.rank() == 0)
+                closure();
+        }
+
         template<class job_type, class result_type>
         vector<result_type> process(vector<job_type> &jobs, Processor<job_type, result_type> &processor) const {
+            broadcast(communicator, jobs, 0);
+
             vector<JobInfo> info(jobs.size());
             int i = 0;
             for_each(jobs.begin(), jobs.end(), [&](job_type &j) {

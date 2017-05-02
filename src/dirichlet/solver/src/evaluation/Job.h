@@ -14,7 +14,9 @@ namespace Dirichlet {
         class Job : public Purple::Job {
 
         public:
-            Job(const int offset, const int height, const double error = 0.001) :
+            Job() : offset(0), height(0), error(0), weight(0) {}
+
+            Job(int offset, int height, double error = 0.001) :
                     offset(offset), height(height), error(error), weight(height / error) {}
 
             virtual int get_weight() const override { return weight; }
@@ -30,9 +32,16 @@ namespace Dirichlet {
         private:
             friend class Processor;
 
-            const int offset, height;
-            const int weight;
-            const double error;
+            PURPLE_SERIALIZE() {
+                ar & offset;
+                ar & height;
+                ar & weight;
+                ar & error;
+            }
+
+            int offset, height;
+            int weight;
+            double error;
 
         };
     }

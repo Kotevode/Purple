@@ -8,20 +8,14 @@ namespace Dirichlet {
 
     Input StreamParser::parse_input() {
         int height, width;
-        double *u = nullptr;
-        double *f = nullptr;
 
         assert(!stream.eof());
 
         // Parsing u
         stream >> width;
         stream >> height;
-        u = (double *) malloc(sizeof(double) * width * height);
-        for (int i = 0; i < width * height; i++)
-            stream >> u[i];
-        f = (double *) malloc(sizeof(double) * width * height);
-        for (int i = 0; i < width * height; i++)
-            stream >> f[i];
+        double *u = parse_mesh(width, height);
+        double *f = parse_mesh(width, height);
 
         // Parsing jobs
         int job_count;
@@ -36,6 +30,13 @@ namespace Dirichlet {
         }
 
         return Input(u, f, width, height, jobs);
+    }
+
+    double * StreamParser::parse_mesh(int width, int height) {
+        double *result = new double[width * height];
+        for (int i = 0; i < width * height; i++)
+            stream >> result[i];
+        return result;
     }
 
 }

@@ -9,14 +9,14 @@
 using namespace Dirichlet;
 
 TEST(InputParserTests, can_parse_from_file) {
-    ifstream file("input_file.in");
+    ifstream file("../test_input_300_20.in");
     ASSERT_TRUE(file.is_open());
     ASSERT_FALSE(file.eof());
     ASSERT_TRUE(file.good());
     auto input = (new StreamParser(file))->parse_input();
-    ASSERT_GT(input.width, 0);
-    ASSERT_GT(input.height, 0);
-    ASSERT_GT(input.jobs.size(), 0);
+    ASSERT_EQ(input.width, 300);
+    ASSERT_EQ(input.height, 300);
+    ASSERT_EQ(input.jobs.size(), 20);
     for (int i = 0; i < input.height * input.width; i++){
         ASSERT_NO_THROW(input.u[i]);
         ASSERT_NO_THROW(input.f[i]);

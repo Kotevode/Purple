@@ -18,6 +18,9 @@ add_executable(dirichlet_solver_tests
         test/conjugation_tests.cpp
         test/solver_tests.cpp
         src/Solver.cpp)
+set_target_properties(dirichlet_solver_tests
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test/build")
 target_link_libraries(dirichlet_solver_tests gtest gtest_main)
 target_link_libraries(dirichlet_solver_tests purple)
 

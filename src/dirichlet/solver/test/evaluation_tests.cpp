@@ -37,19 +37,17 @@ TEST(EvaluationTests, can_serialize_results) {
 }
 
 TEST(EvaluationTests, can_evaluate_mesh) {
-    int width = 100, height = 100;
-    double error = 0.001;
-    double *u = (double *)malloc(sizeof(double) * width * height);
-    fill_n(u, width * (height - 1), 0);
-    fill_n(u + width * (height - 1), height, 1);
-    double *f = (double *)malloc(sizeof(double) * width * height);
-    Evaluation::Job job(0, height, error);
-    Evaluation::Processor p(u, f, width);
+    ifstream in("../test_input_300_1.in");
+    auto input = (new StreamParser(in))->parse_input();
+    Evaluation::Processor p(input.u, input.f, input.width);
+    auto job = input.jobs.front();
     auto result = p.process(job);
-    ASSERT_EQ(result.height, height);
-    ASSERT_EQ(result.width, width);
-    ASSERT_LE(result.error, error);
-    for (int i = 0; i < width * height; i++){
-        ASSERT_GE(result.mesh[i], 0);
+    ASSERT_EQ(result.height, input.height);
+    ASSERT_EQ(result.width, input.width);
+    ASSERT_LE(result.error, 0.001);
+    ifstream out("../test_output_300.out");
+    double *ideal = (new StreamParser(out))->parse_mesh(input.height, input.width);
+    for (int i = 0; i < result.height * result.width; i++){
+        ASSERT_NEAR(ideal[i], result.mesh[i], 0.01);
     }
 }

@@ -15,19 +15,27 @@ namespace Dirichlet {
         class Job : public Purple::Job {
 
         public:
-            Job(const Result &a, const Result &b) : a(a), b(b), weight(a.offset + a.height - b.offset) {
+            Job() : a(Result()), b(Result()), weight(0) {}
+
+            Job(Result &a, Result &b) : a(a), b(b), weight(a.offset + a.height - b.offset) {
                 assert(a.offset < b.offset);
             }
 
-            Job(const Result &a) : a(a), b(Result()), weight(a.height) {}
+            Job(Result &a) : a(a), b(Result()), weight(a.height) {}
 
             virtual int get_weight() const override { return weight; }
 
         private:
             friend class Processor;
 
-            const Result a, b;
-            const int weight;
+            PURPLE_SERIALIZE() {
+                ar & a;
+                ar & b;
+                ar & weight;
+            }
+
+            Result a, b;
+            int weight;
 
         };
 

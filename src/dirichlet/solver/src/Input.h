@@ -15,6 +15,8 @@ using namespace Dirichlet::Evaluation;
 namespace Dirichlet {
 
     struct Input {
+        Input() : u(nullptr), f(nullptr), width(0), height(0) {}
+
         Input(double *u, double *f, int width, int height, const vector<Job, allocator<Job>> &jobs) : u(u), f(f),
                                                                                                       width(width),
                                                                                                       height(height),
@@ -26,8 +28,10 @@ namespace Dirichlet {
         vector<Job> jobs;
 
         virtual ~Input() {
-            free(u);
-            free(f);
+            if (u)
+                free(u);
+            if (f)
+                free(f);
         }
 
     };

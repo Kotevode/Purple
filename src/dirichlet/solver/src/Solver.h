@@ -19,7 +19,7 @@ namespace Dirichlet {
     public:
         Solver(std::shared_ptr<Purple::Cluster> cluster) : cluster(cluster) {}
 
-//        Result process(Input &input);
+        Result process(Input &input);
 
         vector<Result> evaluate(const double *u, const double *f, int width, vector<Evaluation::Job> &jobs);
 

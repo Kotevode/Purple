@@ -19,6 +19,8 @@ namespace Dirichlet {
 
         virtual Input parse_input() override;
 
+        double *parse_mesh(int width, int height);
+
     protected:
         istream &stream;
 

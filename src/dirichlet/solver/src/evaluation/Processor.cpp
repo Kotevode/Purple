@@ -13,7 +13,7 @@ Dirichlet::Result Dirichlet::Evaluation::Processor::process(Dirichlet::Evaluatio
 
     // Slicing job targeted u part
     double *u_sliced = (double *) malloc(sizeof(double) * height * width);
-    memcpy(u_sliced, u + job.offset * width, height * width);
+    memcpy(u_sliced, u + job.offset * width, sizeof(double) * height * width);
     const double *f_sliced = f + job.offset * width;
 
     // Iterations
@@ -23,8 +23,10 @@ Dirichlet::Result Dirichlet::Evaluation::Processor::process(Dirichlet::Evaluatio
             for (int j = 1; j < width - 1; j++) {
                 double temp = u_sliced[i * width + j];
                 u_sliced[i * width + j] =
-                        0.25 * (u_sliced[(i + 1) * width + j] + u_sliced[(i - 1) * width + j] +
-                                u_sliced[i * width + j + 1] + u_sliced[i * width + j - 1] -
+                        0.25 * (u_sliced[(i + 1) * width + j] +
+                                u_sliced[(i - 1) * width + j] +
+                                u_sliced[i * width + j + 1] +
+                                u_sliced[i * width + j - 1] -
                                 f_sliced[i * width + j]);
                 max_error = max(abs(temp - u_sliced[i * width + j]), max_error);
             }
