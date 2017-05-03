@@ -51,11 +51,11 @@ endif()
 add_library(cxxopts INTERFACE)
 target_sources(
   cxxopts INTERFACE
-        include/cxxopts.hpp
+        ${PROJECT_SOURCE_DIR}/include/cxxopts.hpp
   )
 target_include_directories(
   cxxopts INTERFACE
-        include
+        ${PROJECT_SOURCE_DIR}/include
   )
 target_link_libraries(
   cxxopts

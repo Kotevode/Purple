@@ -6,7 +6,7 @@
 
 Dirichlet::Result Dirichlet::Solver::process(Dirichlet::Input &input) {
     auto results = evaluate(input.u, input.f, input.width, input.jobs);
-    return conjugate(input.width, results);
+    return conjugate(input.width, std::move(results));
 }
 
 Dirichlet::Result Dirichlet::Solver::conjugate(int width, vector<Dirichlet::Result> results) {

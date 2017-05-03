@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <algorithm>
 #include "MeshGenerator.h"
 #include "config.h"
 #include "TaskGenerator.h"

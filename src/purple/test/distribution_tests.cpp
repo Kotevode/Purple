@@ -4,7 +4,7 @@
 
 #import <gtest/gtest.h>
 #include <purple/purple.h>
-#include "../src/efdist.h"
+#include "../include/purple/efdist.h"
 
 using namespace std;
 using namespace Purple;

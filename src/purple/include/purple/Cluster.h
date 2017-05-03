@@ -14,6 +14,7 @@
 #include "JobInfo.h"
 #include "Processor.h"
 #include "ResultInfo.h"
+#include "efdist.h"
 
 namespace Purple {
 
@@ -25,7 +26,9 @@ namespace Purple {
     public:
         Cluster(int argc = 0, char *argv[] = nullptr) : env(new boost::mpi::environment(argc, argv)) {};
 
-        ~Cluster();
+        ~Cluster() {
+            delete env;
+        }
 
         template<typename __closure>
         void as_master(__closure closure) {
@@ -73,10 +76,16 @@ namespace Purple {
             return results;
         }
 
-        const mpi::communicator &get_communicator() const;
+        const mpi::communicator &get_communicator() const {
+            return this->communicator;
+        }
 
     private:
-        void distribute(std::vector<JobInfo> &jobs) const;
+        void distribute(std::vector<JobInfo> &jobs) const {
+            if (communicator.rank() == 0)
+                ef_distribution(jobs.begin(), jobs.end(), (size_t) communicator.size());
+            broadcast(communicator, jobs, 0);
+        }
 
         boost::mpi::communicator communicator;
         boost::mpi::environment *env;
