@@ -56,7 +56,7 @@ TEST_F(ClusterTests, test_can_determine_size) {
 
 TEST_F(ClusterTests, test_can_process_complex_jobs) {
     vector<SortJob> jobs;
-    for (int i = 1; i <= 10000; i++) {
+    for (int i = 1; i <= 1000; i++) {
         jobs.push_back(SortJob(i));
     }
 
@@ -64,7 +64,7 @@ TEST_F(ClusterTests, test_can_process_complex_jobs) {
     vector<SortResult> results = c->process(jobs, p);
 
     if (c->get_communicator().rank() == 0) {
-        ASSERT_EQ(results.size(), 10000);
+        ASSERT_EQ(results.size(), 1000);
 
         int j = 1;
         for_each(results.begin(), results.end(), [&](SortResult &result) {

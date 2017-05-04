@@ -37,7 +37,7 @@ TEST(EvaluationTests, can_serialize_results) {
 }
 
 TEST(EvaluationTests, can_evaluate_mesh) {
-    ifstream in("../test_input_300_1.in");
+    ifstream in("test_input_300_1.in");
     auto input = (new StreamParser(in))->parse_input();
     Evaluation::Processor p(input.u, input.f, input.width);
     auto job = input.jobs.front();
@@ -45,7 +45,7 @@ TEST(EvaluationTests, can_evaluate_mesh) {
     ASSERT_EQ(result.height, input.height);
     ASSERT_EQ(result.width, input.width);
     ASSERT_LE(result.error, 0.001);
-    ifstream out("../test_output_300.out");
+    ifstream out("test_output_300.out");
     double *ideal = (new StreamParser(out))->parse_mesh(input.height, input.width);
     for (int i = 0; i < result.height * result.width; i++){
         ASSERT_NEAR(ideal[i], result.mesh[i], 0.01);

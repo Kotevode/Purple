@@ -9,7 +9,7 @@
 using namespace Dirichlet;
 
 TEST(InputParserTests, can_parse_from_file) {
-    ifstream file("../test_input_300_20.in");
+    ifstream file("test_input_300_20.in");
     ASSERT_TRUE(file.is_open());
     ASSERT_FALSE(file.eof());
     ASSERT_TRUE(file.good());

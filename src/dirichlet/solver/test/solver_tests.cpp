@@ -29,7 +29,7 @@ public:
 std::shared_ptr<Purple::Cluster> SolverTests::cluster;
 
 TEST_F(SolverTests, can_evaluate) {
-    ifstream file("../test_input_300_20.in");
+    ifstream file("test_input_300_20.in");
     auto input = (new StreamParser(file))->parse_input();
     cout << "Got input" << endl;
     Solver s(cluster);
@@ -67,7 +67,7 @@ TEST_F(SolverTests, can_conjugate) {
 }
 
 TEST_F(SolverTests, can_process) {
-    ifstream file("../test_input_300_20.in");
+    ifstream file("test_input_300_20.in");
     auto input = (new StreamParser(file))->parse_input();
     cout << "Got input" << endl;
     Solver s(cluster);
