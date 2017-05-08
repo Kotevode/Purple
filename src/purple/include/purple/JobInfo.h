@@ -6,6 +6,7 @@
 #define PURPLE_DISTRIBUTION_JOB_INFO_H
 
 #include <boost/serialization/access.hpp>
+#include "Job.h"
 
 using namespace boost;
 

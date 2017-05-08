@@ -9,11 +9,11 @@
 using namespace std;
 using namespace Purple;
 
-class DummyJob : public Job {
+class GeneratingJob : public Job {
 
 public:
 
-    DummyJob(int weight) : weight(weight) {}
+    GeneratingJob(int weight) : weight(weight) {}
 
     virtual int get_weight() const override {
         return weight;
@@ -25,7 +25,7 @@ private:
 };
 
 TEST(distribution_tests, can_distribute_tasks) {
-    vector<DummyJob> jobs{
+    vector<GeneratingJob> jobs{
             {1},
             {2},
             {3}
