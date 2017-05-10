@@ -24,8 +24,10 @@
 using namespace Purple;
 using namespace std;
 
+random_device rd;
+
 JobInfo * generate_jobs(int n, int SD){
-    GeneratingJob j(AVG_WEIGHT, SD);
+    GeneratingJob j(AVG_WEIGHT, SD, rd);
     auto *result = new JobInfo[n];
     generate(result, result + n, [&]() -> JobInfo {
         return JobInfo(j, 0);

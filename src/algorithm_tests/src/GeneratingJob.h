@@ -13,7 +13,7 @@ using namespace std;
 class WeightGenerator {
 
 public:
-    WeightGenerator(int avg, int sd):gen(mt19937(rd())),distribution(new normal_distribution<>(avg, sd)) {}
+    WeightGenerator(int avg, int sd, random_device &rd):gen(mt19937(rd())),distribution(new normal_distribution<>(avg, sd)) {}
 
     int generate_weight() {
         int result = -1;
@@ -23,7 +23,6 @@ public:
     }
 
 private:
-    random_device rd;
     mt19937 gen;
     normal_distribution<> *distribution;
 
@@ -32,7 +31,7 @@ private:
 class GeneratingJob : public Purple::Job {
 
 public:
-    GeneratingJob(int avg, int sd):generator(new WeightGenerator(avg, sd)) {}
+    GeneratingJob(int avg, int sd, random_device &rd):generator(new WeightGenerator(avg, sd, rd)) {}
 
     virtual int get_weight() const override {
         return generator->generate_weight();
