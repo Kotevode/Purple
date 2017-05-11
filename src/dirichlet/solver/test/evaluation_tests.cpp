@@ -8,6 +8,7 @@
 #include "../src/evaluation/Processor.h"
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <limits>
 
 using namespace Dirichlet;
 
@@ -39,12 +40,16 @@ TEST(EvaluationTests, can_serialize_results) {
 TEST(EvaluationTests, can_evaluate_mesh) {
     ifstream in("test_input_300_1.in");
     auto input = (new StreamParser(in))->parse_input();
-    Evaluation::Processor p(input.u, input.f, input.width);
+    Evaluation::Processor p(input.f);
     auto job = input.jobs.front();
-    auto result = p.process(job);
+    double error = DBL_MAX;
+    Result result;
+    do {
+        result = p.process(job);
+        job = Evaluation::Job(result.offset, result.height, result.width, result.mesh.get());
+    } while (result.error > 0.001);
     ASSERT_EQ(result.height, input.height);
     ASSERT_EQ(result.width, input.width);
-    ASSERT_LE(result.error, 0.001);
     ifstream out("test_output_300.out");
     double *ideal = (new StreamParser(out))->parse_mesh(input.height, input.width);
     for (int i = 0; i < result.height * result.width; i++){

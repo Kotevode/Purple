@@ -3,7 +3,6 @@ add_executable(dirichlet_solver
         src/main.cpp
         src/StreamParser.cpp
         src/evaluation/Processor.cpp
-        src/conjugation/Processor.cpp
         src/Solver.cpp
         )
 target_link_libraries(dirichlet_solver purple)
@@ -14,10 +13,9 @@ add_executable(dirichlet_solver_tests
         src/StreamParser.cpp
         test/evaluation_tests.cpp
         src/evaluation/Processor.cpp
-        src/conjugation/Processor.cpp
-        test/conjugation_tests.cpp
-        test/solver_tests.cpp
-        src/Solver.cpp)
+#        test/solver_tests.cpp
+#        src/Solver.cpp
+        )
 file(COPY
         test/test_input_300_1.in
         test/test_input_300_20.in

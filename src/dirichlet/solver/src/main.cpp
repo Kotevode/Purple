@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     cluster->as_master([&] {
         for (int i = 0; i < result.height; i++) {
             cout
-                    << join(result.mesh + i * result.width, result.mesh + (i + 1) * result.width)
+                    << join(result.mesh.get() + i * result.width, result.mesh.get() + (i + 1) * result.width)
                     << endl;
         }
     });

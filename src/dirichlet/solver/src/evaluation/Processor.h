@@ -15,14 +15,12 @@ namespace Dirichlet {
         class Processor : public Purple::Processor<Job, Result> {
 
         public:
-            Processor(const double *u, const double *f, const int width) : u(u), f(f), width(width) {}
+            Processor(shared_array<const double> f) : f(f) {}
 
             virtual Result process(Job &job) override;
 
         private:
-            const double *u;
-            const double *f;
-            const int width;
+            shared_array<const double> f;
         };
 
     }

@@ -8,7 +8,6 @@
 #include "Result.h"
 #include "Input.h"
 #include "evaluation/Processor.h"
-#include "conjugation/Processor.h"
 #include <purple/Cluster.h>
 #include <memory>
 
@@ -21,9 +20,7 @@ namespace Dirichlet {
 
         Result process(Input &input);
 
-        vector<Result> evaluate(const double *u, const double *f, int width, vector<Evaluation::Job> &jobs);
-
-        Result conjugate(int width, vector<Result> results);
+        vector<Result> evaluate(const double *f, int width, vector<Evaluation::Job> &jobs);
 
     private:
 

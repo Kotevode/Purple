@@ -8,31 +8,26 @@
 #include "evaluation/Job.h"
 #include <vector>
 #include <iostream>
-
-using namespace std;
-using namespace Dirichlet::Evaluation;
+#include <boost/shared_array.hpp>
 
 namespace Dirichlet {
 
     struct Input {
-        Input() : u(nullptr), f(nullptr), width(0), height(0) {}
+        Input() : width(0), height(0) {}
 
-        Input(double *u, double *f, int width, int height, const vector<Job, allocator<Job>> &jobs) : u(u), f(f),
-                                                                                                      width(width),
-                                                                                                      height(height),
-                                                                                                      jobs(jobs) {}
-
-        double *u;
-        double *f;
-        int width, height;
-        vector<Job> jobs;
-
-        virtual ~Input() {
-            if (u)
-                free(u);
-            if (f)
-                free(f);
+        Input(const double f[],
+              size_t width,
+              size_t height,
+              const std::vector<Evaluation::Job> &jobs) : width(width),
+                                                          height(height),
+                                                          jobs(jobs),
+                                                          f(new double[width * height]) {
+            copy(f, f + width * height, this->f.get());
         }
+
+        size_t width, height;
+        vector<Evaluation::Job> jobs;
+        boost::shared_array<double> f;
 
     };
 
