@@ -38,6 +38,8 @@ namespace Purple {
 
         template<class job_type, class result_type>
         vector<result_type> process(vector<job_type> &jobs, Processor<job_type, result_type> &processor) const {
+
+            // Distributing jobs
             broadcast(communicator, jobs, 0);
 
             vector<JobInfo> info(jobs.size());
@@ -48,21 +50,20 @@ namespace Purple {
             });
             distribute(info);
 
-            int rank = communicator.rank();
-            int partial_count = accumulate(info.begin(), info.end(), 0, [rank](int sum, auto &j) -> int {
-                return sum + (j.get_node_number() == rank ? 1 : 0);
-            });
-            vector<ResultInfo<result_type> > partial_results(partial_count);
+            // Processing
 
-            int j = 0;
+            vector<ResultInfo<result_type> > partial_results;
             for_each(info.begin(), info.end(), [&](auto &info) {
-                if (info.get_node_number() != rank)
+                if (info.get_node_number() != communicator.rank())
                     return;
-                partial_results[j] =
-                        ResultInfo<result_type>(processor.process(jobs[info.get_index()]), info.get_index());
-                j++;
+                partial_results.push_back(
+                        ResultInfo<result_type>(processor.process(jobs[info.get_index()]), info.get_index())
+                );
             });
             MPI_Barrier(communicator);
+
+            // Gathering results
+
             vector<vector<ResultInfo<result_type> >> gathered(communicator.size());
             mpi::gather(communicator, partial_results, gathered, 0);
 

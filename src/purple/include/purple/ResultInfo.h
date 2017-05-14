@@ -21,7 +21,7 @@ namespace Purple {
                 result(result), index(index) {}
 
         ResultInfo(ResultInfo &&moving):
-                result(std::move(result)),index(moving.index) {}
+                result(std::move(moving.result)),index(moving.index) {}
 
         ResultInfo(const ResultInfo &copy):
                 result(copy.result),index(copy.index) {}
