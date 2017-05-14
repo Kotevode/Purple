@@ -15,7 +15,7 @@ Dirichlet::Result Dirichlet::Evaluation::Processor::process(Dirichlet::Evaluatio
     double *u = new double[job.height * job.width];
     memcpy(u, job.mesh.get(), sizeof(double) * job.height * job.width);
 
-    // Iterations
+    // Iteration
     double max_error = 0.0;
     for (int i = 1; i < job.height - 1; i++)
         for (int j = 1; j < job.width - 1; j++) {

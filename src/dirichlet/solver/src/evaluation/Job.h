@@ -13,7 +13,7 @@
 namespace Dirichlet {
     namespace Evaluation {
 
-        class Job : public Purple::Job {
+        struct Job : public Purple::Job {
 
         public:
             Job() : offset(0), height(0), width(0), mesh(nullptr) {}
@@ -29,9 +29,6 @@ namespace Dirichlet {
                 os << "offset: " << job.offset << " height: " << job.height;
                 return os;
             }
-
-        private:
-            friend class Processor;
 
             PURPLE_SERIALIZE() {
                 ar & offset;

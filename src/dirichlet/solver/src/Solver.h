@@ -18,9 +18,13 @@ namespace Dirichlet {
     public:
         Solver(std::shared_ptr<Purple::Cluster> cluster) : cluster(cluster) {}
 
-        Result process(Input &input);
+        Result process(Input &input, double error = 0.001);
 
-        vector<Result> evaluate(const double *f, int width, vector<Evaluation::Job> &jobs);
+        void swap_intersections(vector<Evaluation::Job> &jobs);
+
+        void swap_intersections(Evaluation::Job &a, Evaluation::Job &b);
+
+        Result combine(vector<Result> &results, size_t height, double error);
 
     private:
 

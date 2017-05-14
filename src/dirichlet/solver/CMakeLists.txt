@@ -13,8 +13,8 @@ add_executable(dirichlet_solver_tests
         src/StreamParser.cpp
         test/evaluation_tests.cpp
         src/evaluation/Processor.cpp
-#        test/solver_tests.cpp
-#        src/Solver.cpp
+        test/solver_tests.cpp
+        src/Solver.cpp
         )
 file(COPY
         test/test_input_300_1.in

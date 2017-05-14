@@ -20,14 +20,15 @@ namespace Dirichlet {
               size_t height,
               const std::vector<Evaluation::Job> &jobs) : width(width),
                                                           height(height),
-                                                          jobs(jobs),
-                                                          f(new double[width * height]) {
-            copy(f, f + width * height, this->f.get());
+                                                          jobs(jobs) {
+            double * fx = new double[width * height];
+            memcpy(fx, f, sizeof(double) * width * height);
+            this->f = shared_array<const double>(fx);
         }
 
         size_t width, height;
         vector<Evaluation::Job> jobs;
-        boost::shared_array<double> f;
+        boost::shared_array<const double> f;
 
     };
 

@@ -42,7 +42,6 @@ TEST(EvaluationTests, can_evaluate_mesh) {
     auto input = (new StreamParser(in))->parse_input();
     Evaluation::Processor p(input.f);
     auto job = input.jobs.front();
-    double error = DBL_MAX;
     Result result;
     do {
         result = p.process(job);
