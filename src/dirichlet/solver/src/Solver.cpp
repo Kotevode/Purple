@@ -7,6 +7,7 @@
 
 using namespace Dirichlet;
 using namespace Evaluation;
+using namespace std;
 using namespace boost::mpi;
 
 Dirichlet::Result Dirichlet::Solver::process(Dirichlet::Input &input, double error) {
@@ -50,7 +51,7 @@ Dirichlet::Result Dirichlet::Solver::process(Dirichlet::Input &input, double err
     // Combining sufields
 
     Result result;
-    cluster->as_master([&results, &result, &input, max_error, this](){
+    cluster->as_master([&results, &result, &input, max_error, this]() {
         result = this->combine(results, input.height, max_error);
     });
     return result;
@@ -59,11 +60,16 @@ Dirichlet::Result Dirichlet::Solver::process(Dirichlet::Input &input, double err
 void Dirichlet::Solver::swap_intersections(vector<Evaluation::Job> &jobs) {
     auto begin = jobs.begin();
     auto end = jobs.end();
-    while (begin != end - 1)
-        swap_intersections(*begin++, *begin);
+    while (begin++ != end - 1)
+        swap_intersections(*(begin - 1), *begin);
 }
 
 void Dirichlet::Solver::swap_intersections(Evaluation::Job &a, Evaluation::Job &b) {
+    if (b.offset <= a.offset) {
+        std::cout << "Error: wrong jobs order" << std::endl
+                  << "a: " << a << endl
+                  << "b: " << b << endl;
+    }
     assert(b.offset > a.offset);
     assert(b.offset < a.offset + a.height);
     swap_ranges(
@@ -78,7 +84,7 @@ Dirichlet::Solver::combine(vector<Result> &results, size_t height, double error)
     size_t width = results.begin()->width;
     double *result = new double[height * width];
     for_each(results.begin(), results.end(), [&result](auto &r) {
-       memcpy(result + r.width * r.offset, r.mesh.get(), r.width * r.height * sizeof(double));
+        memcpy(result + r.width * r.offset, r.mesh.get(), r.width * r.height * sizeof(double));
     });
     return Result(height, width, result, error, 0);
 }

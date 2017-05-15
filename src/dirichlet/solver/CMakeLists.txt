@@ -21,7 +21,7 @@ file(COPY
         test/test_input_300_20.in
         test/test_output_300.out
         DESTINATION
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(dirichlet_solver_tests gtest gtest_main)
 target_link_libraries(dirichlet_solver_tests purple)
 

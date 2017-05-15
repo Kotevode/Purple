@@ -21,6 +21,10 @@ namespace Dirichlet {
             memcpy(this->mesh.get(), mesh, sizeof(double) * width * height);
         }
 
+        Result(size_t height, size_t width, double *mesh, double error, size_t offset):
+                height(height), width(width), mesh(mesh),
+                error(error), offset(offset) { }
+
         size_t height, width;
         size_t offset;
         double error;
