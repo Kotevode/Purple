@@ -32,7 +32,6 @@ namespace Dirichlet {
             ar & offset;
             ar & error;
             if (Archive::is_loading::value) {
-                assert(mesh.get() == nullptr);
                 mesh = boost::shared_array<double>(new double[height * width]);
             }
             ar & boost::serialization::make_array<double>(mesh.get(), height * width);
