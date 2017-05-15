@@ -11,10 +11,10 @@
 #include <list>
 #include <numeric>
 #include "Job.h"
-#include "JobInfo.h"
 #include "Processor.h"
 #include "ResultInfo.h"
 #include "efdist.h"
+#include <numeric>
 
 namespace Purple {
 
@@ -39,25 +39,23 @@ namespace Purple {
         template<class job_type, class result_type>
         vector<result_type> process(vector<job_type> &jobs, Processor<job_type, result_type> &processor) const {
 
-            // Distributing jobs
-            broadcast(communicator, jobs, 0);
+            // Mapping jobs
 
-            vector<JobInfo> info(jobs.size());
-            int i = 0;
-            for_each(jobs.begin(), jobs.end(), [&](job_type &j) {
-                info[i] = JobInfo(j, i);
-                i++;
-            });
-            distribute(info);
+            if (communicator.rank() == 0)
+                this->map(jobs);
+
+            // Distributing jobs
+
+            broadcast(communicator, jobs, 0);
 
             // Processing
 
             vector<ResultInfo<result_type> > partial_results;
-            for_each(info.begin(), info.end(), [&](auto &info) {
-                if (info.get_node_number() != communicator.rank())
+            for_each(jobs.begin(), jobs.end(), [&processor, &partial_results, this](auto &job) {
+                if (job.get_node_number() != this->communicator.rank())
                     return;
                 partial_results.push_back(
-                        ResultInfo<result_type>(processor.process(jobs[info.get_index()]), info.get_index())
+                        ResultInfo<result_type>(processor.process(job), job.get_index())
                 );
             });
             MPI_Barrier(communicator);
@@ -82,10 +80,17 @@ namespace Purple {
         }
 
     private:
-        void distribute(std::vector<JobInfo> &jobs) const {
-            if (communicator.rank() == 0)
-                ef_distribution(jobs.begin(), jobs.end(), (size_t) communicator.size());
-            broadcast(communicator, jobs, 0);
+
+        template<class job_type>
+        void map(std::vector<job_type> &jobs) const {
+            int i = 0;
+            bool are_mapped = std::accumulate(jobs.begin(), jobs.end(), true, [&i](bool result, auto &j) {
+                j.index = i++;
+                return result & j.is_mapped();
+            });
+            if (are_mapped)
+                return;
+            ef_distribution(jobs.begin(), jobs.end(), (size_t) communicator.size());
         }
 
         boost::mpi::communicator communicator;

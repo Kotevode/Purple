@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <vector>
 #include <limits.h>
-#include "purple/JobInfo.h"
 
 using namespace std;
 

@@ -31,17 +31,13 @@ TEST(distribution_tests, can_distribute_tasks) {
             {3}
     };
 
-    auto info = vector<JobInfo>(3);
-    transform(jobs.begin(), jobs.end(), info.begin(), [](auto &j) -> JobInfo {
-        return JobInfo(j, 0);
-    });
-    ef_distribution(info.begin(), info.end(), 2);
+    ef_distribution(jobs.begin(), jobs.end(), 2);
 
     int load[2];
     memset(load, 0, 2 * sizeof(int));
 
-    for_each(info.begin(), info.end(), [&](auto &i) {
-        load[i.get_node_number()] += i.get_weight();
+    for_each(jobs.begin(), jobs.end(), [&](auto &j) {
+        load[j.get_node_number()] += j.get_weight();
     });
 
     ASSERT_GT(load[0], 0);
