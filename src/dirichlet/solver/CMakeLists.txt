@@ -4,7 +4,7 @@ add_executable(dirichlet_solver
         src/StreamParser.cpp
         src/evaluation/Processor.cpp
         src/Solver.cpp
-        )
+        src/evaluation/Section.h)
 target_link_libraries(dirichlet_solver purple)
 target_link_libraries(dirichlet_solver cxxopts)
 

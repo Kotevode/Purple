@@ -30,10 +30,10 @@ namespace Dirichlet {
             int height;
             stream >> offset;
             stream >> height;
-            jobs.push_back(Job(offset, height, width, u.get() + offset * width));
+            jobs.push_back(Job(offset, height, width));
         }
 
-        return Input(f.get(), width, height, jobs);
+        return Input(f.get(), u.get(), width, height, jobs);
     }
 
     double *StreamParser::parse_mesh(size_t width, size_t height) {

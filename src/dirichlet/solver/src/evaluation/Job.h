@@ -16,11 +16,10 @@ namespace Dirichlet {
         struct Job : public Purple::Job {
 
         public:
-            Job() : offset(0), height(0), width(0), mesh(nullptr) {}
+            Job() : offset(0), height(0), width(0) {}
 
-            Job(size_t offset, size_t height, size_t width, const double mesh[]) :
-                    offset(offset), height(height), width(width), mesh(new double[height * width]) {
-                memcpy(this->mesh.get(), mesh, sizeof(double) * width * height);
+            Job(size_t offset, size_t height, size_t width) :
+                    offset(offset), height(height), width(width) {
             }
 
             virtual int get_weight() const override { return height * width; }
@@ -31,17 +30,13 @@ namespace Dirichlet {
             }
 
             PURPLE_SERIALIZE() {
+                Purple::Job::serialize(ar, version);
                 ar & offset;
                 ar & height;
                 ar & width;
-                if (Archive::is_loading::value) {
-                    mesh = boost::shared_array<double>(new double[height * width]);
-                }
-                ar & boost::serialization::make_array<double>(mesh.get(), height * width);
             }
 
             size_t offset, height, width;
-            boost::shared_array<double> mesh;
 
         };
     }

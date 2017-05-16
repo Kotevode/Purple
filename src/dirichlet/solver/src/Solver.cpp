@@ -4,16 +4,19 @@
 
 #include "Solver.h"
 #include <float.h>
+#include "evaluation/Section.h"
+#include <boost/mpi/collectives.hpp>
 
 using namespace Dirichlet;
 using namespace Evaluation;
 using namespace std;
 using namespace boost::mpi;
+using namespace boost;
 
-Dirichlet::Result Dirichlet::Solver::process(Dirichlet::Input &input, double error) {
-    Processor p(input.f);
+shared_array<double> Dirichlet::Solver::process(Dirichlet::Input &input, double error) {
+    Processor p(input.f, input.u);
     auto jobs = input.jobs;
-    vector<Result> results;
+    vector<double> results;
     bool is_done = false;
     double max_error = 0;
 
@@ -23,9 +26,7 @@ Dirichlet::Result Dirichlet::Solver::process(Dirichlet::Input &input, double err
 
         results = cluster->process(jobs, p);
         cluster->as_master([&is_done, error, &results, &max_error] {
-            max_error = max_element(results.begin(), results.end(), [](auto &a, auto &b) {
-                return a.error < b.error;
-            })->error;
+            max_error = *max_element(results.begin(), results.end());
             cout << max_error << endl;
             is_done = max_error < error;
         });
@@ -39,52 +40,41 @@ Dirichlet::Result Dirichlet::Solver::process(Dirichlet::Input &input, double err
 
         // Swapping intersections of subfields
 
-        jobs.clear();
-        cluster->as_master([&jobs, &results, this] {
-            for_each(results.begin(), results.end(), [&jobs](auto &r) {
-                jobs.push_back(Job(r.offset, r.height, r.width, r.mesh.get()));
-            });
-            this->swap_intersections(jobs);
-        });
+        this->swap_intersections(jobs, p.u.get());
     } while (true);
 
-    // Combining sufields
+    // Combining subfields
+    return combine(jobs, p.u.get());
+}
 
-    Result result;
-    cluster->as_master([&results, &result, &input, max_error, this]() {
-        result = this->combine(results, input.height, max_error);
+void Dirichlet::Solver::swap_intersections(vector<Evaluation::Job> &jobs, double *mesh) {
+    list<Section> sections;
+    sections.splice(sections.end(), swap_intersections(jobs.begin(), jobs.end(), mesh));
+    sections.splice(sections.end(), swap_intersections(jobs.rbegin(), jobs.rend(), mesh));
+    for_each(sections.begin(), sections.end(), [mesh](auto &s){
+        mesh += s;
+    });
+}
+
+shared_array<double>
+Dirichlet::Solver::combine(vector<Job> &jobs, const double *mesh) {
+    auto communicator = cluster->get_communicator();
+    for_each(jobs.begin(), jobs.end(), [mesh, &communicator](auto &j) {
+        if (j.get_node_number() != communicator.rank() || j.get_node_number() == 0)
+            return;
+        communicator.isend(0, 1, Section(j.offset * j.width, j.width * j.height, mesh + j.offset * j.width));
+    });
+    size_t size = jobs.front().width * (jobs.back().offset + jobs.back().height);
+    shared_array<double> result(new double[size]);
+    memcpy(result.get(), mesh, size * sizeof(double));
+    cluster->as_master([&]{
+        for_each(jobs.begin(), jobs.end(), [&communicator, &result](auto &j) {
+           if (j.get_node_number() != 0) {
+               Section s;
+               communicator.recv(j.get_node_number(), 1, s);
+               result.get() += s;
+           }
+        });
     });
     return result;
-}
-
-void Dirichlet::Solver::swap_intersections(vector<Evaluation::Job> &jobs) {
-    auto begin = jobs.begin();
-    auto end = jobs.end();
-    while (begin++ != end - 1)
-        swap_intersections(*(begin - 1), *begin);
-}
-
-void Dirichlet::Solver::swap_intersections(Evaluation::Job &a, Evaluation::Job &b) {
-    if (b.offset <= a.offset) {
-        std::cout << "Error: wrong jobs order" << std::endl
-                  << "a: " << a << endl
-                  << "b: " << b << endl;
-    }
-    assert(b.offset > a.offset);
-    assert(b.offset < a.offset + a.height);
-    swap_ranges(
-            a.mesh.get() + (b.offset - a.offset) * a.width,
-            a.mesh.get() + a.width * a.height,
-            b.mesh.get()
-    );
-}
-
-Result
-Dirichlet::Solver::combine(vector<Result> &results, size_t height, double error) {
-    size_t width = results.begin()->width;
-    double *result = new double[height * width];
-    for_each(results.begin(), results.end(), [&result](auto &r) {
-        memcpy(result + r.width * r.offset, r.mesh.get(), r.width * r.height * sizeof(double));
-    });
-    return Result(height, width, result, error, 0);
 }

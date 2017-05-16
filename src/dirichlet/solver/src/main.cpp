@@ -47,9 +47,9 @@ int main(int argc, char *argv[]) {
     auto result = s.process(input, 0.001);
     cluster->as_master([&] {
         ofstream out(options["output"].as<string>());
-        for (int i = 0; i < result.height; i++) {
+        for (int i = 0; i < input.height; i++) {
             out
-                    << join(result.mesh.get() + i * result.width, result.mesh.get() + (i + 1) * result.width)
+                    << join(result.get() + i * input.width, result.get() + (i + 1) * input.width)
                     << endl;
         }
         out.close();

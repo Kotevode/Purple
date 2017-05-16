@@ -91,6 +91,9 @@ namespace Purple {
             if (are_mapped)
                 return;
             ef_distribution(jobs.begin(), jobs.end(), (size_t) communicator.size());
+            sort(jobs.begin(), jobs.end(), [](auto &a, auto &b) {
+                return a.index < b.index;
+            });
         }
 
         boost::mpi::communicator communicator;

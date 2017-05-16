@@ -7,20 +7,19 @@
 
 #include <purple/purple.h>
 #include "Job.h"
-#include "../Result.h"
 
 namespace Dirichlet {
     namespace Evaluation {
 
-        class Processor : public Purple::Processor<Job, Result> {
+        class Processor : public Purple::Processor<Job, double> {
 
         public:
-            Processor(shared_array<const double> f) : f(f) {}
+            Processor(boost::shared_array<const double> f, boost::shared_array<double> u) : f(f), u(u) {}
 
-            virtual Result process(Job &job) override;
+            virtual double process(Job &job) override;
 
-        private:
-            shared_array<const double> f;
+            boost::shared_array<const double> f;
+            boost::shared_array<double> u;
         };
 
     }
