@@ -18,18 +18,9 @@
 
 namespace Purple {
 
-    using namespace std;
-    namespace mpi = boost::mpi;
-
     class Cluster {
 
     public:
-        Cluster(int argc = 0, char *argv[] = nullptr) : env(new boost::mpi::environment(argc, argv)) {};
-
-        ~Cluster() {
-            delete env;
-        }
-
         template<typename __closure>
         void as_master(__closure closure) {
             if (communicator.rank() == 0)
@@ -94,7 +85,6 @@ namespace Purple {
         }
 
         boost::mpi::communicator communicator;
-        boost::mpi::environment *env;
     };
 
 }

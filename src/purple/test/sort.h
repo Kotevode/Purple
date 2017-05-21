@@ -33,6 +33,7 @@ public:
 
 private:
     PURPLE_SERIALIZE() {
+        Job::serialize(ar, version);
         ar & array;
         ar & weight;
     }
