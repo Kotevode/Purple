@@ -5,51 +5,40 @@
 #ifndef PURPLE_DISTRIBUTION_MESSAGES_H
 #define PURPLE_DISTRIBUTION_MESSAGES_H
 
-#include <map>
-#include "../../Job.h"
+#include <vector>
+#include "purple/Job.h"
+#include <string>
+#include <ctime>
 
 namespace Purple {
     namespace Monitoring {
         namespace Messages {
 
-            struct Message {};
+            struct Message {
+                Message():time(std::time(0)) {}
 
-            struct ClusterCreated : public Message {
-                ClusterCreated(size_t size) : size(size) {}
+                std::time_t time;
 
-                size_t size;
             };
+
+            struct ClusterCreated : public Message {};
 
             struct ProcessingStarted : public Message {
+                struct JobInfo {
+                    size_t weight;
+                    size_t node;
+                };
 
                 template<typename __job_type>
-                ProcessingStarted(const vector<__job_type> &jobs) {
+                ProcessingStarted(const std::vector<__job_type> &jobs) {
+                    info = std::vector<JobInfo>(jobs.size());
                     for_each(jobs.begin(), jobs.end(), [&](auto &j) {
-                        this->jobs[j.get_index()] = j.get_weight();
+                        this->info[j.get_index()] = { (size_t)j.get_weight(), (size_t)j.get_node_number() };
                     });
                 }
 
-                std::map<size_t, size_t> jobs;
+                std::vector<JobInfo> info;
 
-                PURPLE_SERIALIZE () {
-                    ar & jobs;
-                }
-            };
-
-            struct JobsDistributed : public Message {
-
-                template<typename  __job_type>
-                JobsDistributed(const vector<__job_type> &jobs) {
-                    for_each(jobs.begin(), jobs.end(), [&](auto &j) {
-                        this->mapping[j.get_index()] = j.get_weight();
-                    });
-                }
-
-                std::map<size_t, size_t> mapping;
-
-                PURPLE_SERIALIZE () {
-                    ar & mapping;
-                }
             };
 
             struct JobStatusChanged : public Message {
@@ -65,26 +54,16 @@ namespace Purple {
                 size_t index;
                 JobStatus status;
 
-                PURPLE_SERIALIZE () {
-                    ar & index;
-                    ar & status;
-                }
             };
 
-            struct ProcessingDone : public Message {
-            };
+            struct ProcessingDone : public Message {};
 
-            struct ClusterFinalized : public Message {
-            };
+            struct ClusterFinalized : public Message {};
 
             struct LogMessage : public Message {
-                LogMessage(string message) : message(message) {}
+                LogMessage(std::string message) : message(message) {}
 
-                string message;
-
-                PURPLE_SERIALIZE () {
-                    ar & message;
-                }
+                std::string message;
 
             };
 

@@ -17,8 +17,6 @@ namespace Purple {
 
             virtual void send(const Messages::ClusterFinalized &message) = 0;
 
-            virtual void send(const Messages::JobsDistributed &message) = 0;
-
             virtual void send(const Messages::JobStatusChanged &message) = 0;
 
             virtual void send(const Messages::ProcessingDone &message) = 0;
@@ -27,7 +25,7 @@ namespace Purple {
 
             virtual void send(const Messages::LogMessage &message) = 0;
 
-            virtual ~Logger() = 0;
+            virtual ~Logger() {}
 
         };
 

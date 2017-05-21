@@ -23,7 +23,7 @@ namespace Purple {
 
     public:
         Cluster(Monitoring::Logger *logger = nullptr) : logger(logger) {
-            this->log(Monitoring::Messages::ClusterCreated(this->communicator.size()));
+            this->log(Monitoring::Messages::ClusterCreated());
         }
 
         template<typename __closure>
@@ -35,11 +35,11 @@ namespace Purple {
         template<class job_type, class result_type>
         vector<result_type> process(vector<job_type> &jobs, Processor<job_type, result_type> &processor) const {
 
-            this->log(Monitoring::Messages::ProcessingStarted(jobs));
             // Mapping jobs
 
             if (communicator.rank() == 0)
                 this->map(jobs);
+            this->log(Monitoring::Messages::ProcessingStarted(jobs));
 
             // Distributing jobs
 
@@ -82,6 +82,39 @@ namespace Purple {
             return results;
         }
 
+        template<class job_type>
+        void process(vector<job_type> &jobs, Processor<job_type, void> &processor) const {
+
+            // Mapping jobs
+
+            if (communicator.rank() == 0)
+                this->map(jobs);
+            this->log(Monitoring::Messages::ProcessingStarted(jobs));
+
+            // Distributing jobs
+
+            broadcast(communicator, jobs, 0);
+
+            // Processing
+
+            for_each(jobs.begin(), jobs.end(), [&processor, this](auto &job) {
+                if (job.get_node_number() != this->communicator.rank())
+                    return;
+                this->log(Monitoring::Messages::JobStatusChanged(
+                        job.get_index(),
+                        Monitoring::Messages::JobStatusChanged::RUNNING
+                ));
+                processor.process(job);
+                this->log(Monitoring::Messages::JobStatusChanged(
+                        job.get_index(),
+                        Monitoring::Messages::JobStatusChanged::DONE
+                ));
+            });
+            MPI_Barrier(communicator);
+
+            this->log(Monitoring::Messages::ProcessingDone());
+        }
+
         const mpi::communicator &get_communicator() const {
             return this->communicator;
         }
@@ -104,7 +137,6 @@ namespace Purple {
             if (are_mapped)
                 return;
             ef_distribution(jobs.begin(), jobs.end(), (size_t) communicator.size());
-            this->log(Monitoring::Messages::JobsDistributed(jobs));
         }
 
         boost::mpi::communicator communicator;
