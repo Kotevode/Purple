@@ -14,7 +14,7 @@ include_directories(${MPI_INCLUDE_PATH})
 # Boost
 ############################################################
 
-find_package(Boost REQUIRED mpi serialization)
+find_package(Boost REQUIRED mpi serialization iostreams)
 include_directories(${Boost_INCLUDE_DIRS})
 
 ############################################################
@@ -29,6 +29,12 @@ include_directories(${gtest_INCLUDE_DIRS})
 ############################################################
 
 add_subdirectory(libs/cxxopts-master)
+
+############################################################
+# JSON
+############################################################
+
+add_subdirectory(libs/json)
 
 ############################################################
 # Purple

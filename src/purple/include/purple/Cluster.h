@@ -125,6 +125,10 @@ namespace Purple {
                 logger->send(message);
         }
 
+        ~Cluster() {
+            log(Monitoring::Messages::ClusterFinalized());
+        }
+
     private:
 
         template<class job_type>

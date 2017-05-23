@@ -61,9 +61,9 @@ namespace Purple {
             struct ClusterFinalized : public Message {};
 
             struct LogMessage : public Message {
-                LogMessage(std::string message) : message(message) {}
+                LogMessage(std::string body) : body(body) {}
 
-                std::string message;
+                std::string body;
 
             };
 

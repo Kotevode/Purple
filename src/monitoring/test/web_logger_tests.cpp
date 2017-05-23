@@ -1,17 +1,17 @@
 //
-// Created by Mark on 21.05.17.
+// Created by Mark on 23.05.17.
 //
 
 #include <gtest/gtest.h>
-#include <boost/mpi.hpp>
-#include "monitoring/ConsoleLogger.h"
+#include <monitoring/web/Logger.h>
 #include <purple/Cluster.h>
+#include <boost/mpi.hpp>
 #include "wait.h"
 
 using namespace boost::mpi;
-using namespace Monitoring;
+using namespace Monitoring::Web;
 
-class MonitoringTests : public ::testing::Test {
+class WebLoggerTests : public ::testing::Test {
 
 public:
     virtual void SetUp() {}
@@ -32,13 +32,12 @@ public:
 
 };
 
-environment *MonitoringTests::env;
+environment *WebLoggerTests::env;
 
-
-TEST_F(MonitoringTests, can_log_to_console) {
-    Purple::Cluster c(new ConsoleLogger());
+TEST_F(WebLoggerTests, can_write_to_fifo) {
+    Purple::Cluster c(new Logger("/tmp/proc"));
     vector<WaitJob> jobs;
-    for(int i = 0; i < 10; i++)
+    for(int i = 0; i < 5; i++)
         jobs.push_back(WaitJob(i));
     WaitProcessor p;
     c.process(jobs, p);
