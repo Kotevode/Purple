@@ -27,13 +27,18 @@ namespace Purple {
                 struct JobInfo {
                     size_t weight;
                     size_t node;
+                    size_t index;
                 };
 
                 template<typename __job_type>
                 ProcessingStarted(const std::vector<__job_type> &jobs) {
                     info = std::vector<JobInfo>(jobs.size());
                     for_each(jobs.begin(), jobs.end(), [&](auto &j) {
-                        this->info[j.get_index()] = { (size_t)j.get_weight(), (size_t)j.get_node_number() };
+                        this->info[j.get_index()] = {
+                                (size_t)j.get_weight(),
+                                (size_t)j.get_node_number(),
+                                (size_t)j.get_index()
+                        };
                     });
                 }
 

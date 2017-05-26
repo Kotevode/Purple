@@ -13,4 +13,7 @@ target_link_libraries(console_logger_tests gtest gtest_main)
 
 add_executable(web_logger_tests test/web_logger_tests.cpp)
 target_link_libraries(web_logger_tests monitoring)
-target_link_libraries(web_logger_tests gtest gtest_main)
+target_link_libraries(web_logger_tests ger_tests gtest gtest_main)
+
+add_executable(web_logger_test_app test/web_logger_test_app.cpp)
+target_link_libraries(web_logger_test_app monitoring)

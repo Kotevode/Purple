@@ -19,11 +19,11 @@ const char *Monitoring::Web::MessageType<Purple::Monitoring::Messages::Processin
 template<>
 const char *Monitoring::Web::MessageType<Purple::Monitoring::Messages::ClusterFinalized>::to_s = "cluster_finalized";
 template<>
-const char *Monitoring::Web::MessageType<Purple::Monitoring::Messages::LogMessage>::to_s = "cluster_log_messagecreated";
+const char *Monitoring::Web::MessageType<Purple::Monitoring::Messages::LogMessage>::to_s = "cluster_log_message_created";
 
 nlohmann::json Monitoring::Web::Formatter::format(const Purple::Monitoring::Messages::ClusterCreated &message) const {
     auto j = prepare(message);
-    j["size"] = communicator.size();
+    j["content"]["size"] = communicator.size();
     return j;
 }
 
@@ -34,19 +34,20 @@ Monitoring::Web::Formatter::format(const Purple::Monitoring::Messages::Processin
     for_each(message.info.begin(), message.info.end(), [&info](auto &job) {
         info.push_back(
                 {
+                        {"index",  job.index},
                         {"weight", job.weight},
                         {"node",   job.node}
                 }
         );
     });
-    j["info"] = info;
+    j["content"]["info"] = info;
     return j;
 }
 
 nlohmann::json Monitoring::Web::Formatter::format(const Purple::Monitoring::Messages::JobStatusChanged &message) const {
     auto j = prepare(message);
-    j["index"] = message.index;
-    j["status"] = message.status;
+    j["content"]["index"] = message.index;
+    j["content"]["status"] = message.status;
     return j;
 }
 
@@ -60,6 +61,6 @@ nlohmann::json Monitoring::Web::Formatter::format(const Purple::Monitoring::Mess
 
 nlohmann::json Monitoring::Web::Formatter::format(const Purple::Monitoring::Messages::LogMessage &message) const {
     auto j = prepare(message);
-    j["body"] = message.body;
+    j["content"]["body"] = message.body;
     return j;
 }

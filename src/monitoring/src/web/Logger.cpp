@@ -69,8 +69,8 @@ void Monitoring::Web::Logger::receive() {
 
 void Monitoring::Web::Logger::write(const std::string &dump) {
     if (out) {
-        uint64_t size = dump.size();
-        if (size > 0) {
+        if (!dump.empty()) {
+            uint64_t size = dump.size();
             stream_mutex.lock();
             out->write((const char *)&size, 8);
             out->write(dump.c_str(), size);
@@ -84,7 +84,7 @@ Monitoring::Web::Logger::~Logger() {
     running = false;
     if (rank == 0) {
         delete out;
-        communicator.send(0, communication_tag, "");
+        communicator.send(0, communication_tag, std::string());
         communication_thread.join();
     }
 }
