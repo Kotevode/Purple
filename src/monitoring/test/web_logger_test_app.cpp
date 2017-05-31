@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     Purple::Cluster c(new Logger(pipe));
     vector<WaitJob> jobs;
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < 15; i++)
         jobs.push_back(WaitJob(i));
     WaitProcessor p;
     c.process(jobs, p);

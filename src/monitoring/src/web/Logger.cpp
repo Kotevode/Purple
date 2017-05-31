@@ -56,7 +56,7 @@ void Monitoring::Web::Logger::write(const nlohmann::json &json) {
     if (rank == 0)
         write(s);
     else
-        communicator.isend(0, communication_tag, s);
+        communicator.send(0, communication_tag, s);
 }
 
 void Monitoring::Web::Logger::receive() {
