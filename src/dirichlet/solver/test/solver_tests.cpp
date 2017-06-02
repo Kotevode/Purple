@@ -6,33 +6,39 @@
 #include <fstream>
 #include "../src/Solver.h"
 #include "../src/StreamParser.h"
-#include "../src/evaluation/Job.h"
+#include <memory>
 
 using namespace Dirichlet;
 using namespace Evaluation;
+using namespace boost::mpi;
 
 class SolverTests : public ::testing::Test {
 
 public:
-    static std::shared_ptr<Purple::Cluster> cluster;
+    static environment *env;
 
     virtual void SetUp() {}
 
     virtual void TearDown() {}
 
     static void SetUpTestCase() {
-        cluster = std::shared_ptr<Purple::Cluster>(new Purple::Cluster(0, NULL));
+        int argc = 0;
+        char **argv;
+        env = new environment(argc, argv);
     }
 
-    static void TearDownTestCase() {}
+    static void TearDownTestCase() {
+        delete env;
+    }
 
 };
 
-std::shared_ptr<Purple::Cluster> SolverTests::cluster;
+environment * SolverTests::env;
 
 TEST_F(SolverTests, can_swap_sections) {
     size_t width = 4;
     size_t height = 2;
+    auto cluster = std::shared_ptr<Purple::Cluster>(new Purple::Cluster());
     auto comm = cluster->get_communicator();
     auto rank = comm.rank();
     double *mesh = new double[(comm.size() + 1) * width];
@@ -60,6 +66,7 @@ TEST_F(SolverTests, can_process) {
     ifstream file("test_input_300_20.in");
     auto input = (new StreamParser(file))->parse_input();
     cout << "Got input" << endl;
+    auto cluster = std::shared_ptr<Purple::Cluster>(new Purple::Cluster());
     Solver s(cluster);
     auto result = s.process(input, 0.001);
     cluster->as_master([&] {
