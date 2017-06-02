@@ -7,31 +7,27 @@
 
 using namespace std;
 
-Dirichlet::Result Dirichlet::Evaluation::Processor::process(Dirichlet::Evaluation::Job &job) {
-    double error = numeric_limits<double>().max();
-    int height = job.height;
+double Dirichlet::Evaluation::Processor::process(Dirichlet::Evaluation::Job &job) {
 
-    // Slicing job targeted u part
-    double *u_sliced = (double *) malloc(sizeof(double) * height * width);
-    memcpy(u_sliced, u + job.offset * width, sizeof(double) * height * width);
-    const double *f_sliced = f + job.offset * width;
+    // Get F slice
+    const double *f_sliced = f.get() + job.offset * job.width;
 
-    // Iterations
-    while (error > job.error) {
-        double max_error = 0.0;
-        for (int i = 1; i < height - 1; i++)
-            for (int j = 1; j < width - 1; j++) {
-                double temp = u_sliced[i * width + j];
-                u_sliced[i * width + j] =
-                        0.25 * (u_sliced[(i + 1) * width + j] +
-                                u_sliced[(i - 1) * width + j] +
-                                u_sliced[i * width + j + 1] +
-                                u_sliced[i * width + j - 1] -
-                                f_sliced[i * width + j]);
-                max_error = max(abs(temp - u_sliced[i * width + j]), max_error);
-            }
-        error = max_error;
-    }
+    // Get U slice
+    double *u_sliced = u.get() + job.offset * job.width;
 
-    return Result(height, width, u_sliced, error, job.offset);
+    // Iteration
+    double max_error = 0.0;
+    for (int i = 1; i < job.height - 1; i++)
+        for (int j = 1; j < job.width - 1; j++) {
+            double temp = u_sliced[i * job.width + j];
+            u_sliced[i * job.width + j] =
+                    0.25 * (u_sliced[(i + 1) * job.width + j] +
+                            u_sliced[(i - 1) * job.width + j] +
+                            u_sliced[i * job.width + j + 1] +
+                            u_sliced[i * job.width + j - 1] -
+                            f_sliced[i * job.width + j]);
+            max_error = max(abs(temp - u_sliced[i * job.width + j]), max_error);
+        }
+
+    return max_error;
 }

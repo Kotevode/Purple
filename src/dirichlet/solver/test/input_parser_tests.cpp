@@ -18,7 +18,6 @@ TEST(InputParserTests, can_parse_from_file) {
     ASSERT_EQ(input.height, 300);
     ASSERT_EQ(input.jobs.size(), 20);
     for (int i = 0; i < input.height * input.width; i++){
-        ASSERT_NO_THROW(input.u[i]);
         ASSERT_NO_THROW(input.f[i]);
     }
     for_each(input.jobs.begin(), input.jobs.end(), [](auto &j){

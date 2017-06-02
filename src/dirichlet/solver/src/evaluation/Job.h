@@ -7,41 +7,36 @@
 
 #include <purple/purple.h>
 #include <ostream>
+#include <algorithm>
+#include <boost/shared_array.hpp>
 
 namespace Dirichlet {
     namespace Evaluation {
 
-        class Job : public Purple::Job {
+        struct Job : public Purple::Job {
 
         public:
-            Job() : offset(0), height(0), error(0), weight(0) {}
+            Job() : offset(0), height(0), width(0) {}
 
-            Job(int offset, int height, double error = 0.001) :
-                    offset(offset), height(height), error(error), weight(height / error) {}
+            Job(size_t offset, size_t height, size_t width) :
+                    offset(offset), height(height), width(width) {
+            }
 
-            virtual int get_weight() const override { return weight; }
-
-            const double get_error() const { return error; }
+            virtual int get_weight() const override { return height * width; }
 
             friend std::ostream &operator<<(std::ostream &os, const Job &job) {
-                os << "offset: " << job.offset << " height: " << job.height
-                   << " weight: " << job.weight << " error: " << job.error;
+                os << "offset: " << job.offset << " height: " << job.height;
                 return os;
             }
 
-        private:
-            friend class Processor;
-
             PURPLE_SERIALIZE() {
+                Purple::Job::serialize(ar, version);
                 ar & offset;
                 ar & height;
-                ar & weight;
-                ar & error;
+                ar & width;
             }
 
-            int offset, height;
-            int weight;
-            double error;
+            size_t offset, height, width;
 
         };
     }

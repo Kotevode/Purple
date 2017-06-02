@@ -6,79 +6,75 @@
 #include <fstream>
 #include "../src/Solver.h"
 #include "../src/StreamParser.h"
+#include <memory>
 
 using namespace Dirichlet;
+using namespace Evaluation;
+using namespace boost::mpi;
 
 class SolverTests : public ::testing::Test {
 
 public:
-    static std::shared_ptr<Purple::Cluster> cluster;
+    static environment *env;
 
     virtual void SetUp() {}
 
     virtual void TearDown() {}
 
     static void SetUpTestCase() {
-        cluster = std::shared_ptr<Purple::Cluster>(new Purple::Cluster(0, NULL));
+        int argc = 0;
+        char **argv;
+        env = new environment(argc, argv);
     }
 
-    static void TearDownTestCase() {}
+    static void TearDownTestCase() {
+        delete env;
+    }
 
 };
 
-std::shared_ptr<Purple::Cluster> SolverTests::cluster;
+environment * SolverTests::env;
 
-TEST_F(SolverTests, can_evaluate) {
-    ifstream file("test_input_300_20.in");
-    auto input = (new StreamParser(file))->parse_input();
-    cout << "Got input" << endl;
-    Solver s(cluster);
-    auto results = s.evaluate(input.u, input.f, input.width, input.jobs);
-    cluster->as_master([&] {
-        ASSERT_EQ(results.size(), input.jobs.size());
-        auto job_it = input.jobs.begin();
-        auto res_it = results.begin();
-        while (job_it != input.jobs.end()) {
-            ASSERT_LE(res_it->error, job_it->get_error());
-            for (int i = 0; i < res_it->height * res_it->width; i++) {
-                ASSERT_NO_THROW(res_it->mesh[i]);
-            }
-            res_it++;
-            job_it++;
-        }
-    });
-}
+TEST_F(SolverTests, can_swap_sections) {
+    size_t width = 4;
+    size_t height = 2;
+    auto cluster = std::shared_ptr<Purple::Cluster>(new Purple::Cluster());
+    auto comm = cluster->get_communicator();
+    auto rank = comm.rank();
+    double *mesh = new double[(comm.size() + 1) * width];
+    double *part = mesh + rank * width;
 
-TEST_F(SolverTests, can_conjugate) {
-    int count = 10, height = 100, width = 100;
-    vector<Result> results;
-    for (int i = 0, o = 0; i < count; i++, o += height / 2)
-        results.push_back(
-                Result(height, width, new double[height * width], 0, o)
-        );
+    fill(part, part + height * width, rank);
+    vector<Job> jobs;
+    for (int i = 0; i < comm.size(); i++) {
+        Job j(i, height, width);
+        j.set_node_number(i);
+        jobs.push_back(j);
+    }
     Solver s(cluster);
-    auto result = s.conjugate(width, results);
-    cluster->as_master([&] {
-        ASSERT_EQ(result.height, (int) (height / 2 * (count + 1)));
-        ASSERT_EQ(result.offset, 0);
-        for (int i = 0; i < result.height * result.width; i++)
-            ASSERT_NO_THROW(result.mesh[i]);
-    });
+    s.swap_intersections(jobs, mesh);
+    for(int i = 0; i < width; i++) {
+        if (rank != 0)
+            ASSERT_EQ(part[i], rank - 1);
+        if (rank != comm.size() - 1)
+            ASSERT_EQ(part[i + width], rank + 1);
+    }
+    delete[] mesh;
 }
 
 TEST_F(SolverTests, can_process) {
     ifstream file("test_input_300_20.in");
     auto input = (new StreamParser(file))->parse_input();
     cout << "Got input" << endl;
+    auto cluster = std::shared_ptr<Purple::Cluster>(new Purple::Cluster());
     Solver s(cluster);
-    auto result = s.process(input);
+    auto result = s.process(input, 0.001);
     cluster->as_master([&] {
-        ASSERT_EQ(result.offset, 0);
-        ASSERT_EQ(result.height, input.height);
-        ASSERT_EQ(result.width, input.width);
-        ifstream out("../test_output_300.out");
+        ifstream out("test_output_300.out");
         double *ideal = (new StreamParser(out))->parse_mesh(input.height, input.width);
-        for (int i = 0; i < result.height * result.width; i++)
-            ASSERT_NEAR(ideal[i], result.mesh[i], 0.01);
+        double max_error = 0;
+        for (int i = 0; i < input.height * input.width; i++)
+            max_error = max(abs(ideal[i] - result[i]), max_error);
+        ASSERT_LE(max_error, 0.01);
     });
 }

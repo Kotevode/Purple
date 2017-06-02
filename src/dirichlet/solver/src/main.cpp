@@ -24,7 +24,7 @@ Input get_input(const cxxopts::Options &options) {
 template<typename __it>
 string join(__it begin, __it end) {
     stringstream s;
-    while (begin != end--)
+    while (begin != end - 1)
         s << *begin++ << "\t";
     s << *begin;
     return s.str();
@@ -37,19 +37,22 @@ int main(int argc, char *argv[]) {
             "Test program that performs solving of Laplass equation via Purple Library"
     );
     options.add_options()
-            ("f,file", "File name", cxxopts::value<string>());
+            ("f,file", "File name", cxxopts::value<string>())
+            ("o,output", "Output file name", cxxopts::value<string>());
     options.parse(argc, argv);
 
     auto input = get_input(options);
     std::shared_ptr<Purple::Cluster> cluster(new Purple::Cluster(argc, argv));
     Solver s(cluster);
-    auto result = s.process(input);
+    auto result = s.process(input, 0.001);
     cluster->as_master([&] {
-        for (int i = 0; i < result.height; i++) {
-            cout
-                    << join(result.mesh + i * result.width, result.mesh + (i + 1) * result.width)
+        ofstream out(options["output"].as<string>());
+        for (int i = 0; i < input.height; i++) {
+            out
+                    << join(result.get() + i * input.width, result.get() + (i + 1) * input.width)
                     << endl;
         }
+        out.close();
     });
     return 0;
 }
