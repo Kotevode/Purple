@@ -4,11 +4,13 @@
 
 #include <gtest/gtest.h>
 #include <purple/purple.h>
+#include <boost/mpi.hpp>
 #include "avg.h"
 #include "sort.h"
 
 using namespace Purple;
 using namespace std;
+using namespace boost::mpi;
 
 class ClusterTests : public ::testing::Test {
 
@@ -17,21 +19,21 @@ public:
 
     virtual void TearDown() {}
 
-    static Cluster *c;
+    static environment *env;
 
     static void SetUpTestCase() {
         int argc = 0;
         char **argv;
-        c = new Cluster(argc, argv);
+        env = new environment(argc, argv);
     }
 
     static void TearDownTestCase() {
-        delete c;
+        delete env;
     }
 
 };
 
-Cluster *ClusterTests::c;
+environment *ClusterTests::env;
 
 TEST_F(ClusterTests, test_can_process) {
     vector<AvgJob> jobs{
@@ -41,17 +43,14 @@ TEST_F(ClusterTests, test_can_process) {
     };
 
     AvgProcessor p;
-    vector<AvgResult> results = c->process(jobs, p);
+    Cluster c;
+    vector<AvgResult> results = c.process(jobs, p);
 
-    if (c->get_communicator().rank() == 0) {
+    if (c.get_communicator().rank() == 0) {
         ASSERT_EQ(results[0].get_result(), 5.0);
         ASSERT_EQ(results[1].get_result(), 6.0);
         ASSERT_EQ(results[2].get_result(), 8.0);
     }
-}
-
-TEST_F(ClusterTests, test_can_determine_size) {
-    ASSERT_GT(c->get_communicator().size(), 0);
 }
 
 TEST_F(ClusterTests, test_can_process_complex_jobs) {
@@ -61,9 +60,10 @@ TEST_F(ClusterTests, test_can_process_complex_jobs) {
     }
 
     SortProcessor p;
-    vector<SortResult> results = c->process(jobs, p);
+    Cluster c;
+    vector<SortResult> results = c.process(jobs, p);
 
-    if (c->get_communicator().rank() == 0) {
+    if (c.get_communicator().rank() == 0) {
         ASSERT_EQ(results.size(), 1000);
 
         int j = 1;
