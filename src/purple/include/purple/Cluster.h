@@ -36,8 +36,8 @@ namespace Purple {
                 closure();
         }
 
-        template<class job_type, class result_type>
-        vector<result_type> process(vector<job_type> &jobs, Processor<job_type, result_type> &processor) const {
+        template<class __job_type, class __result_type>
+        vector<__result_type> process(vector<__job_type> &jobs, Processor<__job_type, __result_type> &processor) const {
 
             // Mapping jobs
 
@@ -50,22 +50,22 @@ namespace Purple {
 
             // Processing
 
-            vector<ResultInfo<result_type> > partial_results;
+            vector<ResultInfo<__result_type> > partial_results;
             for_each(jobs.begin(), jobs.end(), [&processor, &partial_results, this](auto &job) {
                 if (job.get_node_number() != this->communicator.rank())
                     return;
                 partial_results.push_back(
-                        ResultInfo<result_type>(processor.process(job), job.get_index())
+                        ResultInfo<__result_type>(processor.process(job), job.get_index())
                 );
             });
             MPI_Barrier(communicator);
 
             // Gathering results
 
-            vector<vector<ResultInfo<result_type> >> gathered(communicator.size());
+            vector<vector<ResultInfo<__result_type> >> gathered(communicator.size());
             mpi::gather(communicator, partial_results, gathered, 0);
 
-            vector<result_type> results(jobs.size());
+            vector<__result_type> results(jobs.size());
             for_each(gathered.begin(), gathered.end(), [&](auto &partial) {
                 for_each(partial.begin(), partial.end(), [&](auto &result_info) {
                     results[result_info.get_index()] = std::move(result_info.get_result());
@@ -81,8 +81,9 @@ namespace Purple {
 
     private:
 
-        template<class job_type>
-        void map(std::vector<job_type> &jobs) const {
+
+        template<class __job_type>
+        void map(std::vector<__job_type> &jobs) const {
             int i = 0;
             bool are_mapped = std::accumulate(jobs.begin(), jobs.end(), true, [&i](bool result, auto &j) {
                 j.index = i++;
