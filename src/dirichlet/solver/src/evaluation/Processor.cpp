@@ -2,6 +2,9 @@
 // Created by Mark on 25.04.17.
 //
 
+//
+// Processor.cpp
+//
 #include "Processor.h"
 #include <limits>
 
@@ -9,13 +12,13 @@ using namespace std;
 
 double Dirichlet::Evaluation::Processor::process(Dirichlet::Evaluation::Job &job) {
 
-    // Get F slice
+    // Выбираем охватываемую часть f
     const double *f_sliced = f.get() + job.offset * job.width;
 
-    // Get U slice
+    // Выбираем охватываемую часть u
     double *u_sliced = u.get() + job.offset * job.width;
 
-    // Iteration
+    // Производим итерацию
     double max_error = 0.0;
     for (int i = 1; i < job.height - 1; i++)
         for (int j = 1; j < job.width - 1; j++) {

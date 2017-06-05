@@ -23,7 +23,7 @@ struct task {
 class TaskGenerator {
 
 public:
-    static vector<struct task> generate(int count, int height);
+    static vector<struct task> generate(int mean, int height);
 
 };
 

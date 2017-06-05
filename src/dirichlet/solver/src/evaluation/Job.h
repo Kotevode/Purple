@@ -5,6 +5,10 @@
 #ifndef PURPLE_DISTRIBUTION_EVALUATION_JOB_H
 #define PURPLE_DISTRIBUTION_EVALUATION_JOB_H
 
+//
+// Job.h
+//
+
 #include <purple/purple.h>
 #include <ostream>
 #include <algorithm>
@@ -15,13 +19,14 @@ namespace Dirichlet {
 
         struct Job : public Purple::Job {
 
-        public:
             Job() : offset(0), height(0), width(0) {}
 
             Job(size_t offset, size_t height, size_t width) :
                     offset(offset), height(height), width(width) {
             }
 
+            // Метод, возвращающий трудоемкость задачи,
+            // определяемой как площадь подобласти
             virtual int get_weight() const override { return height * width; }
 
             friend std::ostream &operator<<(std::ostream &os, const Job &job) {
@@ -29,6 +34,8 @@ namespace Dirichlet {
                 return os;
             }
 
+            // Метод сериализации задачи, вызывающий метод сериалзиации
+            // родительсткого класса
             PURPLE_SERIALIZE() {
                 Purple::Job::serialize(ar, version);
                 ar & offset;
@@ -36,7 +43,12 @@ namespace Dirichlet {
                 ar & width;
             }
 
-            size_t offset, height, width;
+            // Смещение подобласти по высоте
+            size_t offset;
+            // Высота подобласти
+            size_t height;
+            // Ширина подобласти
+            size_t width;
 
         };
     }

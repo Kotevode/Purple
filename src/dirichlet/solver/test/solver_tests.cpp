@@ -63,7 +63,7 @@ TEST_F(SolverTests, can_swap_sections) {
 }
 
 TEST_F(SolverTests, can_process) {
-    ifstream file("test_input_300_20.in");
+    ifstream file("test_input_300.in");
     auto input = (new StreamParser(file))->parse_input();
     cout << "Got input" << endl;
     auto cluster = std::shared_ptr<Purple::Cluster>(new Purple::Cluster());

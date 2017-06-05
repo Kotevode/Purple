@@ -26,21 +26,13 @@ namespace Dirichlet {
             Section(const double *mesh, const Job &a, const Job &b):
                     start(a.width * b.offset), size(a.width * (a.offset + a.height - b.offset)) {
                 assert(a.offset < b.offset);
+                assert(size > 0);
                 this->mesh = boost::shared_array<double>(new double[size]);
                 memcpy(this->mesh.get(), mesh + start, sizeof(double) * size);
             }
 
             size_t start, size;
             boost::shared_array<double> mesh;
-
-            friend Section operator+(const Section &a, const Section &b) {
-                assert(a.start + a.size < b.start);
-                double size = b.start + b.size - a.start;
-                double *mesh = new double[size];
-                memcpy(mesh, a.mesh.get(), sizeof(double) * (b.start - a.start));
-                memcpy(mesh + (b.start - a.start), b.mesh.get(), sizeof(double) * b.size);
-                return Section(a.start, size, mesh);
-            }
 
             friend double *operator+=(double *mesh, const Section &s) {
                 memcpy(mesh + s.start, s.mesh.get(), sizeof(double) * s.size);

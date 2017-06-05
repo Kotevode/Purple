@@ -18,7 +18,7 @@ add_executable(dirichlet_solver_tests
         )
 file(COPY
         test/test_input_300_1.in
-        test/test_input_300_20.in
+        test/test_input_300.in
         test/test_output_300.out
         DESTINATION
         "${CMAKE_CURRENT_BINARY_DIR}")

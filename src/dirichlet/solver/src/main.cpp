@@ -40,12 +40,14 @@ int main(int argc, char *argv[]) {
             ("f,file", "File name", cxxopts::value<string>())
             ("o,output", "Output file name", cxxopts::value<string>());
     options.parse(argc, argv);
-
+    boost::mpi::environment env(argc, argv);
     auto input = get_input(options);
-    std::shared_ptr<Purple::Cluster> cluster(new Purple::Cluster(argc, argv));
+    std::shared_ptr<Purple::Cluster> cluster(new Purple::Cluster());
     Solver s(cluster);
+    auto start = clock();
     auto result = s.process(input, 0.001);
     cluster->as_master([&] {
+        cout << "Elapsed : " << (double)(clock() - start)/CLOCKS_PER_SEC << endl;
         ofstream out(options["output"].as<string>());
         for (int i = 0; i < input.height; i++) {
             out
