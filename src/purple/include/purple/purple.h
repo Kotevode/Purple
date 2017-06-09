@@ -8,5 +8,6 @@
 #include "Cluster.h"
 #include "Processor.h"
 #include "Job.h"
+#include "monitoring/Logger.h"
 
 #endif //PURPLE_DISTRIBUTION_PURPLE_H

@@ -15,12 +15,17 @@
 #include "ResultInfo.h"
 #include "efdist.h"
 #include <numeric>
+#include "monitoring/Logger.h"
 
 namespace Purple {
 
     class Cluster {
 
     public:
+        Cluster(Monitoring::Logger *logger = nullptr) : logger(logger) {
+            this->log(Monitoring::Messages::ClusterCreated());
+        }
+
         template<typename __closure>
         void as_master(__closure closure) {
             if (communicator.rank() == 0)
@@ -34,6 +39,7 @@ namespace Purple {
 
             if (communicator.rank() == 0)
                 this->map(jobs);
+            this->log(Monitoring::Messages::ProcessingStarted(jobs));
 
             // Distributing jobs
 
@@ -45,9 +51,17 @@ namespace Purple {
             for_each(jobs.begin(), jobs.end(), [&processor, &partial_results, this](auto &job) {
                 if (job.get_node_number() != this->communicator.rank())
                     return;
+                this->log(Monitoring::Messages::JobStatusChanged(
+                        job.get_index(),
+                        Monitoring::Messages::JobStatusChanged::RUNNING
+                ));
                 partial_results.push_back(
                         ResultInfo<__result_type>(processor.process(job), job.get_index())
                 );
+                this->log(Monitoring::Messages::JobStatusChanged(
+                        job.get_index(),
+                        Monitoring::Messages::JobStatusChanged::DONE
+                ));
             });
             MPI_Barrier(communicator);
 
@@ -63,11 +77,56 @@ namespace Purple {
                 });
             });
 
+            this->log(Monitoring::Messages::ProcessingDone());
+
             return results;
+        }
+
+        template<class job_type>
+        void process(vector<job_type> &jobs, Processor<job_type, void> &processor) const {
+
+            // Mapping jobs
+
+            if (communicator.rank() == 0)
+                this->map(jobs);
+            this->log(Monitoring::Messages::ProcessingStarted(jobs));
+
+            // Distributing jobs
+
+            broadcast(communicator, jobs, 0);
+
+            // Processing
+
+            for_each(jobs.begin(), jobs.end(), [&processor, this](auto &job) {
+                if (job.get_node_number() != this->communicator.rank())
+                    return;
+                this->log(Monitoring::Messages::JobStatusChanged(
+                        job.get_index(),
+                        Monitoring::Messages::JobStatusChanged::RUNNING
+                ));
+                processor.process(job);
+                this->log(Monitoring::Messages::JobStatusChanged(
+                        job.get_index(),
+                        Monitoring::Messages::JobStatusChanged::DONE
+                ));
+            });
+            MPI_Barrier(communicator);
+
+            this->log(Monitoring::Messages::ProcessingDone());
         }
 
         const mpi::communicator &get_communicator() const {
             return this->communicator;
+        }
+
+        template<typename __message_type>
+        void log(const __message_type &message) const {
+            if (logger)
+                logger->send(message);
+        }
+
+        ~Cluster() {
+            log(Monitoring::Messages::ClusterFinalized());
         }
 
     private:
@@ -89,6 +148,8 @@ namespace Purple {
         }
 
         boost::mpi::communicator communicator;
+        boost::shared_ptr<Monitoring::Logger> logger;
+
     };
 
 }
