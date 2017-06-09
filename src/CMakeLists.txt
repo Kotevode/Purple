@@ -14,7 +14,7 @@ include_directories(${MPI_INCLUDE_PATH})
 # Boost
 ############################################################
 
-find_package(Boost REQUIRED mpi serialization iostreams)
+find_package(Boost REQUIRED mpi serialization)
 include_directories(${Boost_INCLUDE_DIRS})
 
 ############################################################

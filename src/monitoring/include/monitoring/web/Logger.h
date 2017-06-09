@@ -10,6 +10,7 @@
 #include <json/json.hpp>
 #include <boost/mpi.hpp>
 #include <thread>
+#include <mutex>
 
 namespace Monitoring {
     namespace Web {

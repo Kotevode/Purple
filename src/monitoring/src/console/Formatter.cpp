@@ -29,7 +29,7 @@ Monitoring::Console::Formatter::format(const Purple::Monitoring::Messages::Proce
       << endl;
     size_t total_weight[size];
     fill_n(total_weight, size, 0);
-    for_each(message.info.begin(), message.info.end(), [&](auto &p) {
+    for_each(message.info.begin(), message.info.end(), [&total_weight](auto &p) {
         total_weight[p.node] += p.weight;
     });
 
